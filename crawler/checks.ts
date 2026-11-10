@@ -52,6 +52,7 @@ export function pageIssues(p: PageResult): Issue[] {
  */
 export function createDuplicateTracker() {
   const titles = new Map<string, string[]>();
+  const counted = new Set<string>(); // final URLs - a redirect to an already counted page isn't a duplicate
   const descriptions = new Map<string, string[]>();
 
   const push = (map: Map<string, string[]>, key: string | undefined, url: string) => {
@@ -67,6 +68,8 @@ export function createDuplicateTracker() {
       if (!isHtml(p) || p.robots?.includes("noindex")) return;
       // canonicalised pages point somewhere else on purpose
       if (p.canonical && p.canonical !== p.finalUrl) return;
+      if (counted.has(p.finalUrl)) return;
+      counted.add(p.finalUrl);
       push(titles, p.title, p.url);
       push(descriptions, p.description, p.url);
     },

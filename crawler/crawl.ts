@@ -57,6 +57,8 @@ export async function crawl(opts: CrawlOptions) {
       done++;
       try {
         const { page, links } = await fetchPage(item.url, item.depth, { userAgent, timeoutMs, maxBytes, signal: opts.signal });
+        // a redirect landed on a page we haven't queued yet - don't fetch it again later
+        seen.add(page.finalUrl);
         if (item.depth < maxDepth) {
           for (const href of links) {
             const next = normalizeUrl(href, page.finalUrl);
